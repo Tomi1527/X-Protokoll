@@ -92,7 +92,7 @@
         sessionStorage.setItem('username', data.username);
 
         if(data.role === 'agent') window.location.href = "aktensystem.html";
-        else window.location.href = "wartung.html";
+        else window.location.href = "logauswahl.html";
       } else {
         document.getElementById("error").innerText = "Benutzername oder Passwort falsch!";
       }
@@ -101,7 +101,7 @@
     if(sessionStorage.getItem('loggedIn') === 'true') {
       const role = sessionStorage.getItem('role');
       if(role === 'agent') window.location.href = "aktensystem.html";
-      else window.location.href = "wartung.html";
+      else window.location.href = "logauswahl.html";
     }
   </script>
 </body>
