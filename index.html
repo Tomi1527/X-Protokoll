@@ -66,43 +66,59 @@
   </div>
 
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
-  <script>
-    const SUPABASE_URL = "https://xkflcxzifnpkhkmlzdoa.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhrZmxjeHppZm5wa2hrbWx6ZG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1NjA4MDIsImV4cCI6MjA3MDEzNjgwMn0.QizK419VRChe2lHwF1hBldTnxqV2j1c1moScB_YL-dg";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    async function login() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
+  const SUPABASE_URL = "https://xkflcxzifnpkhkmlzdoa.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhrZmxjeHppZm5wa2hrbWx6ZG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1NjA4MDIsImV4cCI6MjA3MDEzNjgwMn0.QizK419VRChe2lHwF1hBldTnxqV2j1c1moScB_YL-dg";
 
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('username', username)
-        .eq('password', password)
-        .single();
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      const success = !!data && !error;
+  window.login = async function () {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
 
-      await supabase.from('logins').insert([{ username, success, created_at: new Date().toISOString() }]);
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("username", username)
+      .eq("password", password)
+      .single();
 
- if(success) {
-        sessionStorage.setItem('loggedIn', 'true');
-        sessionStorage.setItem('role', data.role);
-        sessionStorage.setItem('username', data.username);
+    const success = !!data && !error;
 
-        if(data.role === 'agent') window.location.href = "aktensystem.html";
-        else window.location.href = "logauswahl.html";
-      } else {
-        document.getElementById("error").innerText = "Benutzername oder Passwort falsch!";
+    await supabase.from("logins").insert([
+      {
+        username,
+        success,
+        created_at: new Date().toISOString()
       }
-    }
+    ]);
 
-    if(sessionStorage.getItem('loggedIn') === 'true') {
-      const role = sessionStorage.getItem('role');
-      if(role === 'agent') window.location.href = "aktensystem.html";
-      else window.location.href = "logauswahl.html";
+    if (success) {
+      sessionStorage.setItem("loggedIn", "true");
+      sessionStorage.setItem("role", data.role);
+      sessionStorage.setItem("username", data.username);
+
+      if (data.role === "agent") {
+        window.location.href = "aktensystem.html";
+      } else {
+        window.location.href = "logauswahl.html";
+      }
+    } else {
+      document.getElementById("error").innerText =
+        "Benutzername oder Passwort falsch!";
     }
-  </script>
+  };
+
+  if (sessionStorage.getItem("loggedIn") === "true") {
+    const role = sessionStorage.getItem("role");
+    if (role === "agent") {
+      window.location.href = "aktensystem.html";
+    } else {
+      window.location.href = "logauswahl.html";
+    }
+  }
+</script>
 </body>
 </html>
