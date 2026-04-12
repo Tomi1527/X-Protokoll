@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>X-Protokoll</title>
-  <meta name="description" content="Kostenloses Aktensystem mit Supabase-Sync. Dark Mode, Suche, Sortierung, Einträge/Logs, Export/Import. Läuft statisch auf GitHub Pages." />
+  <title>LSPD Aktensystem</title>
+  <meta name="description" content="LSPD Aktensystem für FiveM - Moderne Aktenverwaltung mit Suche und Logs." />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <script>
     tailwind.config = { darkMode: 'class' };
   </script>
@@ -18,31 +19,49 @@
   <style>
     html { scroll-behavior: smooth; }
     input[type=file] { display: none; }
+    body { background: #000000; }
   </style>
 </head>
-<body class="bg-gray-900 text-gray-100">
-  <div class="min-h-screen max-w-6xl mx-auto px-4 py-6">
+<body class="bg-black text-white min-h-screen">
+  <div class="min-h-screen max-w-7xl mx-auto px-4 py-6">
     <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight">X-Protokoll</h1>
-        <p class="text-sm text-gray-400"></p>
+      <div class="flex items-center gap-3">
+        <i class="fas fa-shield-alt text-4xl text-green-400"></i>
+        <div>
+          <h1 class="text-4xl font-bold tracking-tight text-white">LSPD Aktensystem</h1>
+          <p class="text-sm text-gray-400">FiveM Roleplay - Aktenverwaltung</p>
+          <p class="text-xs text-gray-500">Angemeldet als: <span id="userDisplay"></span></p>
+        </div>
       </div>
       <div class="flex flex-wrap gap-2">
-        <button id="btnConfig" class="px-4 py-2 rounded-2xl bg-gray-700 text-white shadow hover:bg-gray-600">Verbinden</button>
-        <button id="btnAdd" class="px-4 py-2 rounded-2xl bg-blue-600 text-white shadow hover:bg-blue-700">Neue Person</button>
-        <label for="importFile" class="px-4 py-2 rounded-2xl bg-gray-800 border shadow hover:bg-gray-700 cursor-pointer">Backup Laden</label>
+        <button id="btnConfig" class="px-4 py-2 rounded-2xl bg-gray-700 text-white shadow hover:bg-gray-600 transition duration-200">
+          <i class="fas fa-cog mr-2"></i>Verbinden
+        </button>
+        <button id="btnAdd" class="px-4 py-2 rounded-2xl bg-gray-800 text-white shadow hover:bg-gray-700 transition duration-200">
+          <i class="fas fa-plus mr-2"></i>Neue Person
+        </button>
+        <label for="importFile" class="px-4 py-2 rounded-2xl bg-gray-900 border border-gray-600 shadow hover:bg-gray-800 cursor-pointer transition duration-200">
+          <i class="fas fa-upload mr-2"></i>Backup Laden
+        </label>
         <input id="importFile" type="file" accept="application/json" />
-        <button id="btnExport" class="px-4 py-2 rounded-2xl bg-gray-800 border shadow hover:bg-gray-700">Backup Ziehen</button>
-        <button id="btnReset" class="px-4 py-2 rounded-2xl bg-red-800 text-red-100 border border-red-700 hover:bg-red-700">Alles löschen</button>
+        <button id="btnExport" class="px-4 py-2 rounded-2xl bg-gray-900 border border-gray-600 shadow hover:bg-gray-800 transition duration-200">
+          <i class="fas fa-download mr-2"></i>Backup Ziehen
+        </button>
+        <button id="btnReset" class="px-4 py-2 rounded-2xl bg-red-800 text-red-100 border border-red-700 hover:bg-red-700 transition duration-200">
+          <i class="fas fa-trash mr-2"></i>Alles löschen
+        </button>
+        <a href="logauswahl.html" class="px-4 py-2 rounded-2xl bg-gray-700 text-white shadow hover:bg-gray-600 transition duration-200">
+          <i class="fas fa-list mr-2"></i>Logs
+        </a>
       </div>
     </header>
 
     <section class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
       <div class="col-span-2 flex items-center gap-2">
-        <input id="search" type="search" placeholder="Suche nach Name, Telefon, Fraktion…" class="w-full px-4 py-2 rounded-2xl border shadow bg-gray-800 focus:outline-none focus:ring focus:ring-blue-500" />
+        <input id="search" type="search" placeholder="Suche nach Name, Telefon, Fraktion, Einträgen…" class="w-full px-4 py-2 rounded-2xl border border-gray-600 shadow bg-gray-900 text-white focus:outline-none focus:ring focus:ring-green-500" />
       </div>
       <div class="flex items-center gap-2 justify-between md:justify-end">
-        <select id="sortBy" class="px-3 py-2 rounded-2xl border bg-gray-800 shadow">
+        <select id="sortBy" class="px-3 py-2 rounded-2xl border border-gray-600 bg-gray-900 text-white shadow">
           <option value="name-asc">Name A–Z</option>
           <option value="name-desc">Name Z–A</option>
           <option value="updatedAt-desc">Zuletzt geändert ↓</option>
@@ -54,16 +73,16 @@
       </div>
     </section>
 
-    <section class="bg-gray-800 rounded-2xl shadow overflow-hidden">
+    <section class="bg-gray-900 rounded-2xl shadow overflow-hidden border border-gray-700">
       <div class="overflow-x-auto">
         <table class="min-w-full border-collapse">
-          <thead class="bg-gray-700 text-left text-sm">
+          <thead class="bg-gray-800 text-left text-sm">
             <tr>
-              <th class="px-4 py-3">Name</th>
-              <th class="px-4 py-3">Telefon</th>
-              <th class="px-4 py-3">Fraktion</th>
-              <th class="px-4 py-3">Geändert</th>
-              <th class="px-4 py-3">Aktionen</th>
+              <th class="px-4 py-3 text-green-400"><i class="fas fa-user mr-1"></i>Name</th>
+              <th class="px-4 py-3 text-green-400"><i class="fas fa-phone mr-1"></i>Telefon</th>
+              <th class="px-4 py-3 text-green-400"><i class="fas fa-users mr-1"></i>Fraktion</th>
+              <th class="px-4 py-3 text-green-400"><i class="fas fa-clock mr-1"></i>Geändert</th>
+              <th class="px-4 py-3 text-green-400"><i class="fas fa-cogs mr-1"></i>Aktionen</th>
             </tr>
           </thead>
           <tbody id="tableBody" class="text-sm"></tbody>
@@ -71,88 +90,114 @@
       </div>
     </section>
 
-    <dialog id="detailDialog" class="w-full max-w-3xl rounded-2xl p-0">
-      <form method="dialog" class="p-4 flex justify-between items-start border-b bg-gray-800 text-gray-100">
-        <h3 class="text-lg font-semibold">Akte: <span id="detailName"></span></h3>
-        <button class="px-3 py-1 rounded-xl bg-gray-700">Schließen</button>
+    <dialog id="detailDialog" class="w-full max-w-5xl rounded-2xl p-0 bg-black border border-gray-700">
+      <form method="dialog" class="p-4 flex justify-between items-start border-b border-gray-600 bg-gray-900 text-white">
+        <h3 class="text-lg font-semibold text-green-400">Akte: <span id="detailName"></span></h3>
+        <button class="px-3 py-1 rounded-xl bg-gray-700 hover:bg-gray-600 text-white transition duration-200">Schließen</button>
       </form>
-      <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-900 text-gray-100">
+      <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 bg-black text-white">
         <div class="md:col-span-1">
-          <div class="bg-gray-800 rounded-xl p-3 border">
+          <div class="bg-gray-900 rounded-xl p-3 border border-gray-600">
             <dl class="text-sm space-y-2">
               <div>
-                <dt class="text-gray-400">Telefon</dt>
+                <dt class="text-gray-400"><i class="fas fa-phone mr-1"></i>Telefon</dt>
                 <dd id="detailPhone" class="font-medium"></dd>
               </div>
               <div>
-                <dt class="text-gray-400">Adresse</dt>
+                <dt class="text-gray-400"><i class="fas fa-map-marker-alt mr-1"></i>Adresse</dt>
                 <dd id="detailAddress" class="font-medium whitespace-pre-wrap"></dd>
               </div>
               <div>
-                <dt class="text-gray-400">Fraktion</dt>
+                <dt class="text-gray-400"><i class="fas fa-users mr-1"></i>Fraktion</dt>
                 <dd id="detailNotes" class="font-medium whitespace-pre-wrap"></dd>
               </div>
               <div>
-                <dt class="text-gray-400">Erstellt</dt>
+                <dt class="text-gray-400"><i class="fas fa-calendar-plus mr-1"></i>Erstellt</dt>
                 <dd id="detailCreated" class="font-medium"></dd>
               </div>
               <div>
-                <dt class="text-gray-400">Zuletzt geändert</dt>
+                <dt class="text-gray-400"><i class="fas fa-edit mr-1"></i>Zuletzt geändert</dt>
                 <dd id="detailUpdated" class="font-medium"></dd>
               </div>
             </dl>
           </div>
         </div>
         <div class="md:col-span-2">
-          <div class="flex items-center justify-between mb-2">
-            <h4 class="font-semibold">Einträge</h4>
-            <button id="btnAddLog" class="px-3 py-1 rounded-xl bg-blue-600 text-white">Neuer Eintrag</button>
+          <div class="flex flex-col gap-3 mb-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h4 class="font-semibold text-green-400"><i class="fas fa-file-alt mr-1"></i>Einträge</h4>
+              <p class="text-xs text-gray-400">Suche nach Einträgen oder filtere nach Typ.</p>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center">
+              <input id="logSearch" type="search" placeholder="Einträge durchsuchen…" class="px-3 py-2 rounded-2xl bg-gray-900 border border-gray-700 text-white text-sm w-full md:w-64 focus:outline-none focus:ring focus:ring-green-500" />
+              <select id="entryFilter" class="px-2 py-2 rounded-2xl bg-gray-900 border border-gray-600 text-white text-sm">
+                <option value="all">Alle</option>
+                <option value="Notiz">Notizen</option>
+                <option value="Verhaftung">Verhaftungen</option>
+                <option value="Vorladung">Vorladungen</option>
+                <option value="Bericht">Berichte</option>
+                <option value="Sonstiges">Sonstiges</option>
+              </select>
+              <button id="btnAddLog" class="px-3 py-2 rounded-2xl bg-green-600 text-white hover:bg-green-700 transition duration-200">
+                <i class="fas fa-plus mr-1"></i>Neuer Eintrag
+              </button>
+            </div>
           </div>
-          <ul id="logList" class="space-y-2 max-h-96 overflow-y-auto pr-1"></ul>
+          <div id="logList" class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-2 max-h-[30rem] overflow-y-auto pr-1"></div>
         </div>
       </div>
     </dialog>
 
-    <dialog id="editDialog" class="w-full max-w-2xl rounded-2xl p-0">
-      <form method="dialog" class="p-4 flex justify-between items-start border-b bg-gray-800 text-gray-100">
-        <h3 id="editTitle" class="text-lg font-semibold">Neue Person</h3>
-        <button class="px-3 py-1 rounded-xl bg-gray-700">Abbrechen</button>
+    <dialog id="editDialog" class="w-full max-w-2xl rounded-2xl p-0 bg-black border border-gray-700">
+      <form method="dialog" class="p-4 flex justify-between items-start border-b border-gray-600 bg-gray-900 text-white">
+        <h3 id="editTitle" class="text-lg font-semibold text-green-400">Neue Person</h3>
+        <button class="px-3 py-1 rounded-xl bg-gray-700 hover:bg-gray-600 text-white transition duration-200">Abbrechen</button>
       </form>
-      <div class="p-4 bg-gray-900 text-gray-100">
+      <div class="p-4 bg-black text-white">
         <form id="editForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input type="hidden" name="id" />
           <div>
-            <label class="block text-sm text-gray-400 mb-1">Name *</label>
-            <input name="name" required placeholder="Vor- und Nachname" class="w-full px-3 py-2 rounded-xl border bg-gray-800" />
+            <label class="block text-sm text-gray-400 mb-1"><i class="fas fa-user mr-1"></i>Name *</label>
+            <input name="name" required placeholder="Vor- und Nachname" class="w-full px-3 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:outline-none focus:ring focus:ring-green-500" />
           </div>
           <div>
-            <label class="block text-sm text-gray-400 mb-1">Telefon</label>
-            <input name="phone" placeholder="z. B. 1234567" class="w-full px-3 py-2 rounded-xl border bg-gray-800" />
+            <label class="block text-sm text-gray-400 mb-1"><i class="fas fa-phone mr-1"></i>Telefon</label>
+            <input name="phone" placeholder="z. B. 1234567" class="w-full px-3 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:outline-none focus:ring focus:ring-green-500" />
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm text-gray-400 mb-1">Adresse</label>
-            <textarea name="address" rows="2" placeholder="Straße Nr.PLZ Ort" class="w-full px-3 py-2 rounded-xl border bg-gray-800"></textarea>
+            <label class="block text-sm text-gray-400 mb-1"><i class="fas fa-map-marker-alt mr-1"></i>Adresse</label>
+            <textarea name="address" rows="2" placeholder="Straße Nr.PLZ Ort" class="w-full px-3 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:outline-none focus:ring focus:ring-green-500"></textarea>
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm text-gray-400 mb-1">Fraktion</label>
-            <textarea name="notes" rows="3" placeholder="z. B. Zugehörigkeit, Infos…" class="w-full px-3 py-2 rounded-xl border bg-gray-800"></textarea>
+            <label class="block text-sm text-gray-400 mb-1"><i class="fas fa-users mr-1"></i>Fraktion</label>
+            <textarea name="notes" rows="3" placeholder="z. B. Zugehörigkeit, Infos…" class="w-full px-3 py-2 rounded-xl border border-gray-600 bg-gray-900 text-white focus:outline-none focus:ring focus:ring-green-500"></textarea>
           </div>
           <div class="md:col-span-2 flex justify-end gap-2">
-            <button type="submit" class="px-4 py-2 rounded-2xl bg-blue-600 text-white">Speichern</button>
+            <button type="submit" class="px-4 py-2 rounded-2xl bg-green-600 text-white hover:bg-green-700 transition duration-200">Speichern</button>
           </div>
         </form>
       </div>
     </dialog>
 
-    <footer class="mt-8 text-center text-xs text-gray-400">
-      <p> <strong>X-Protokoll</strong> auf den Fivem GTA Roleplay Server Retro Roleplay</p>
+    <footer class="mt-8 text-center text-xs text-gray-500">
+      <p> <i class="fas fa-shield-alt mr-1 text-green-400"></i> <strong class="text-green-400">LSPD Aktensystem</strong> für FiveM Retro Roleplay</p>
     </footer>
   </div>
 
   <script>
 
     const $ = (sel, ctx=document) => ctx.querySelector(sel);
-    const fmt = (d) => new Date(d).toLocaleString();
+    const fmt = (d) => {
+      if (!d) return '';
+      try {
+        return new Date(d).toLocaleString('de-DE', {
+          dateStyle: 'short',
+          timeStyle: 'short'
+        });
+      } catch (err) {
+        return String(d);
+      }
+    };
 
     let SUPABASE_URL = localStorage.getItem('AKTE_SUPABASE_URL') || '';
     let SUPABASE_ANON = localStorage.getItem('AKTE_SUPABASE_ANON') || '';
@@ -186,12 +231,24 @@
       alert('Verbunden!');
     }
 
-    let state = { records: [], search: '', sortBy: 'updatedAt-desc' };
+    let state = { records: [], entries: [], search: '', sortBy: 'updatedAt-desc' };
     const tableBody = $('#tableBody');
     const count = $('#count');
 
     function cleanPhone(v){ if(!v) return ''; return v.replace(/[^+\d]/g,'').replace(/^(0{2})(\d)/,'+$2'); }
     function escapeHtml(s){ return String(s).replace(/[&<>\"]{1}/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+
+    function parseEntryTitle(title){
+      const known = ['Notiz','Verhaftung','Vorladung','Bericht','Sonstiges'];
+      if (!title) return { type: 'Sonstiges', title: '' };
+      if (title === 'Vorherige Fraktionen') return { type: 'Sonstiges', title };
+      const [prefix, ...rest] = title.split(':');
+      const raw = rest.join(':').trim();
+      if (known.includes(prefix.trim())) {
+        return { type: prefix.trim(), title: raw };
+      }
+      return { type: 'Sonstiges', title };
+    }
 
     function mapPerson(row){
       return {
@@ -205,22 +262,51 @@
       };
     }
 
-    function matchesSearch(r, q){ if(!q) return true; q=q.toLowerCase(); return [r.name,r.phone,r.notes].filter(Boolean).some(x=>String(x).toLowerCase().includes(q)); }
+    function matchesSearch(r, q){ 
+      if(!q) return true; 
+      q = q.toLowerCase(); 
+      const personMatch = [r.name, r.phone, r.notes, r.address].filter(Boolean).some(x => String(x).toLowerCase().includes(q));
+      if(personMatch) return true;
+      // Check entries
+      const personEntries = state.entries.filter(e => e.person_id === r.id);
+      return personEntries.some(e => [e.title, e.text].filter(Boolean).some(x => String(x).toLowerCase().includes(q)));
+    }
     function getSorted(records){ const [field,dir]=state.sortBy.split('-'); const mult=dir==='asc'?1:-1; return [...records].sort((a,b)=>{ if(field==='name') return a.name.localeCompare(b.name)*mult; return (new Date(a[field])-new Date(b[field]))*mult; }); }
+
+    async function logAudit(tableName, action, oldData = null, newData = null) {
+      const username = sessionStorage.getItem('username') || 'Unbekannt';
+      console.log('Logging audit:', tableName, action, username);
+      const { error } = await sb.from('audit_logs').insert({
+        username,
+        table_name: tableName,
+        action,
+        old_data: oldData ? JSON.stringify(oldData) : null,
+        new_data: newData ? JSON.stringify(newData) : null
+      });
+      if (error) {
+        console.error('Audit log failed:', error);
+      }
+    }
 
     function render(){
       const filtered = state.records.filter(r=>matchesSearch(r, state.search));
       const rows = getSorted(filtered).map(r => `
-        <tr class="border-t hover:bg-gray-700">
-          <td class="px-4 py-3 font-medium">${escapeHtml(r.name)}</td>
-          <td class="px-4 py-3">${escapeHtml(r.phone||'')}</td>
-          <td class="px-4 py-3">${escapeHtml((r.notes||'').slice(0,80))}${(r.notes&&r.notes.length>80)?'…':''}</td>
-          <td class="px-4 py-3 whitespace-nowrap">${fmt(r.updatedAt)}</td>
+        <tr class="border-t border-gray-700 hover:bg-gray-800 transition duration-200">
+          <td class="px-4 py-3 font-medium text-white">${escapeHtml(r.name)}</td>
+          <td class="px-4 py-3 text-gray-300">${escapeHtml(r.phone||'')}</td>
+          <td class="px-4 py-3 text-gray-300">${escapeHtml((r.notes||'').slice(0,80))}${(r.notes&&r.notes.length>80)?'…':''}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-gray-300">${fmt(r.updatedAt)}</td>
           <td class="px-4 py-3">
             <div class="flex gap-2">
-              <button class="px-3 py-1 rounded-xl bg-gray-800 border" onclick="openDetail('${r.id}')">Details</button>
-              <button class="px-3 py-1 rounded-xl bg-gray-800 border" onclick="openEdit('${r.id}')">Bearbeiten</button>
-              <button class="px-3 py-1 rounded-xl bg-red-800 text-red-100 border border-red-700" onclick="removeRecord('${r.id}')">Löschen</button>
+              <button class="px-3 py-1 rounded-xl bg-gray-900 border border-gray-600 text-white hover:bg-gray-800 transition duration-200" onclick="openDetail('${r.id}')">
+                <i class="fas fa-eye mr-1"></i>Details
+              </button>
+              <button class="px-3 py-1 rounded-xl bg-gray-900 border border-gray-600 text-white hover:bg-gray-800 transition duration-200" onclick="openEdit('${r.id}')">
+                <i class="fas fa-edit mr-1"></i>Bearbeiten
+              </button>
+              <button class="px-3 py-1 rounded-xl bg-red-800 text-red-100 border border-red-700 hover:bg-red-700 transition duration-200" onclick="removeRecord('${r.id}')">
+                <i class="fas fa-trash mr-1"></i>Löschen
+              </button>
             </div>
           </td>
         </tr>`).join('');
@@ -231,9 +317,13 @@
     async function refresh(){
 	
       if(!sb){ render(); return; }
-      const { data, error } = await sb.from('persons').select('*').order('updated_at', { ascending: false });
-      if(error){ console.error(error); alert('Fehler beim Laden: '+error.message); return; }
-      state.records = data.map(mapPerson);
+      const { data: persons, error: personsError } = await sb.from('persons').select('*').order('updated_at', { ascending: false });
+      if(personsError){ console.error(personsError); alert('Fehler beim Laden: '+personsError.message); return; }
+      state.records = persons.map(mapPerson);
+
+      const { data: entries, error: entriesError } = await sb.from('entries').select('*');
+      if(entriesError){ console.error(entriesError); } else { state.entries = entries || []; }
+
       render();
     }
 
@@ -263,6 +353,8 @@ async function createRecord(data){
     return; 
   }
 
+  await logAudit('persons', 'INSERT', null, { name: row.name, phone: row.phone, address: row.address, notes: row.notes });
+
   const { error: logError } = await sb.from('entries').insert({
     person_id: inserted.id,
     title: "Vorherige Fraktionen",
@@ -271,6 +363,8 @@ async function createRecord(data){
 
   if(logError){ 
     console.error("Automatischer Eintrag fehlgeschlagen:", logError.message); 
+  } else {
+    await logAudit('entries', 'INSERT', null, { person_id: inserted.id, title: "Vorherige Fraktionen", text: "" });
   }
 
   await refresh();
@@ -279,18 +373,24 @@ async function createRecord(data){
 
     async function updateRecord(id, patch){
       if(!sb){ alert('Nicht verbunden.'); return; }
+      const { data: oldRecord, error: fetchError } = await sb.from('persons').select('name, phone, address, notes').eq('id', id).single();
+      if(fetchError){ alert('Fehler beim Laden des alten Datensatzes: '+fetchError.message); return; }
       const now = new Date().toISOString();
       const row = { name: patch.name?.trim(), phone: cleanPhone(patch.phone||''), address: (patch.address||'').trim(), notes: (patch.notes||'').trim(), updated_at: now };
       const { error } = await sb.from('persons').update(row).eq('id', id);
       if(error){ alert('Aktualisieren fehlgeschlagen: '+error.message); return; }
+      await logAudit('persons', 'UPDATE', oldRecord, { name: row.name, phone: row.phone, address: row.address, notes: row.notes });
       await refresh();
     }
 
     async function removeRecord(id){
       if(!sb){ alert('Nicht verbunden.'); return; }
       if(!confirm('Diese Akte wirklich löschen?')) return;
+      const { data: oldRecord, error: fetchError } = await sb.from('persons').select('name, phone, address, notes').eq('id', id).single();
+      if(fetchError){ alert('Fehler beim Laden des alten Datensatzes: '+fetchError.message); return; }
       const { error } = await sb.from('persons').delete().eq('id', id);
       if(error){ alert('Löschen fehlgeschlagen: '+error.message); return; }
+      await logAudit('persons', 'DELETE', oldRecord, null);
       await refresh();
     }
 
@@ -299,7 +399,7 @@ const logList = $('#logList');
 let currentDetailId = null;
 
 const logModal = document.createElement('dialog');
-logModal.classList.add('p-4', 'rounded-lg', 'bg-gray-900', 'text-white');
+logModal.classList.add('p-4', 'rounded-lg', 'bg-black', 'text-white', 'border', 'border-gray-700');
 logModal.style.maxWidth = '90vw';
 logModal.style.maxHeight = '80vh';
 document.body.appendChild(logModal);
@@ -316,6 +416,10 @@ async function openDetail(id){
   $('#detailUpdated').textContent = fmt(r.updatedAt);
   await renderLogs(r);
   detailDialog.showModal();
+
+  // Add filter and search listeners
+  $('#entryFilter').onchange = () => renderLogs(r);
+  $('#logSearch').oninput = () => renderLogs(r);
 }
 
 async function renderLogs(r) {
@@ -334,7 +438,7 @@ async function renderLogs(r) {
     return;
   }
 
-  const logs = data || [];
+  let logs = data || [];
 
   logs.sort((a, b) => {
     if (a.title === 'Vorherige Fraktionen') return -1;
@@ -342,18 +446,62 @@ async function renderLogs(r) {
     return 0;
   });
 
+  const filter = $('#entryFilter').value;
+  const search = ($('#logSearch').value || '').trim().toLowerCase();
+
+  if (filter !== 'all') {
+    logs = logs.filter(l => l.title.startsWith(filter));
+  }
+
+  if (search) {
+    logs = logs.filter(l => {
+      const title = String(l.title || '').toLowerCase();
+      const text = String(l.text || '').toLowerCase();
+      return title.includes(search) || text.includes(search);
+    });
+  }
+
   const items = logs.map(l => {
     const isSpecial = l.title === 'Vorherige Fraktionen';
+    const parsed = parseEntryTitle(l.title);
+    const type = parsed.type;
+    const rawTitle = parsed.title || (isSpecial ? l.title : 'Kein Titel');
+    const typeStyles = {
+      'Notiz': 'bg-yellow-950 border-yellow-700',
+      'Verhaftung': 'bg-red-950 border-red-700',
+      'Vorladung': 'bg-blue-950 border-blue-700',
+      'Bericht': 'bg-green-950 border-green-700',
+      'Sonstiges': 'bg-gray-950 border-gray-700'
+    };
+    const style = typeStyles[type] || 'bg-gray-950 border-gray-700';
+    const iconClass = {
+      'Notiz': 'fas fa-sticky-note text-yellow-400',
+      'Verhaftung': 'fas fa-handcuffs text-red-400',
+      'Vorladung': 'fas fa-gavel text-blue-400',
+      'Bericht': 'fas fa-file-alt text-green-400',
+      'Sonstiges': 'fas fa-question-circle text-gray-400'
+    }[type] || 'fas fa-file text-gray-400';
     return `
-      <li class="bg-gray-800 border rounded-xl p-3">
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-xs text-gray-400">${fmt(l.created_at)}</span>
-          ${isSpecial ? '' : `<button class="text-xs px-2 py-1 rounded-lg bg-red-800 text-red-100 border border-red-700" onclick="deleteLog('${l.id}')">Entfernen</button>`}
+      <div class="${style} border rounded-3xl p-3 hover:shadow-xl transition duration-200">
+        <div class="flex items-start gap-2 mb-2">
+          <span class="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-black/40 text-white">
+            <i class="${iconClass}"></i>
+          </span>
+          <div class="min-w-0">
+            <p class="text-[11px] text-gray-400 uppercase tracking-[0.2em]">${escapeHtml(type || 'Eintrag')}</p>
+            <h3 class="text-sm font-semibold text-white cursor-pointer hover:text-gray-200 truncate" onclick="showLogModal('${l.id}')">${escapeHtml(rawTitle)}</h3>
+            <p class="text-[11px] text-gray-300 mt-1">${fmt(l.created_at)}</p>
+          </div>
         </div>
-        <h3 class="mt-2 cursor-pointer text-blue-300 hover:underline" onclick="showLogModal('${l.id}')">
-          ${escapeHtml(l.title || '—')}
-        </h3>
-      </li>
+        <div class="mt-3 flex items-center justify-between gap-2">
+          <button class="text-[11px] px-2 py-1 rounded-2xl bg-gray-900 border border-gray-700 text-white hover:bg-gray-800 transition duration-200" onclick="showLogModal('${l.id}')">
+            <i class="fas fa-eye mr-1"></i>Anzeigen
+          </button>
+          ${isSpecial ? '' : `<button class="text-[11px] px-2 py-1 rounded-2xl bg-red-800 text-red-100 border border-red-700 hover:bg-red-700 transition duration-200" onclick="deleteLog('${l.id}')">
+            <i class="fas fa-trash mr-1"></i>Löschen
+          </button>`}
+        </div>
+      </div>
     `;
   });
 
@@ -363,28 +511,53 @@ async function renderLogs(r) {
 async function addLog(){
   if(!currentDetailId) return;
 
-  logModal.style.width = '400px';
-  logModal.style.height = '300px';
+  logModal.style.width = '620px';
+  logModal.style.height = '520px';
 
   logModal.innerHTML = `
-    <h2 class="text-lg font-bold mb-2">Neuer Eintrag</h2>
-    <input id="logTitle" class="w-full p-2 mb-2 rounded bg-gray-700 text-white" placeholder="Überschrift" />
-    <textarea id="logText" class="w-full p-2 mb-2 rounded bg-gray-700 text-white" placeholder="Text" rows="8"></textarea>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-bold text-green-400"><i class="fas fa-plus-circle mr-2"></i>Neuer Eintrag</h2>
+      <button id="cancelBtn" class="px-3 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-600 transition duration-200">Abbrechen</button>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-300 mb-1">Art</label>
+      <select id="logType" class="w-full p-2 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring focus:ring-green-500">
+        <option value="Notiz">Notiz</option>
+        <option value="Verhaftung">Verhaftung</option>
+        <option value="Vorladung">Vorladung</option>
+        <option value="Bericht">Bericht</option>
+        <option value="Sonstiges">Sonstiges</option>
+      </select>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-300 mb-1">Titel</label>
+      <input id="logTitle" class="w-full p-2 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring focus:ring-green-500" placeholder="Kurze Beschreibung" />
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-300 mb-1">Details</label>
+      <textarea id="logText" class="w-full p-2 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring focus:ring-green-500" placeholder="Ausführliche Informationen" rows="6"></textarea>
+    </div>
     <div class="flex justify-end gap-2">
-      <button id="cancelBtn" class="px-3 py-1 rounded bg-gray-600">Abbrechen</button>
-      <button id="saveBtn" class="px-3 py-1 rounded bg-blue-600">Speichern</button>
+      <button id="saveBtn" class="px-4 py-2 rounded bg-green-600 hover:bg-green-700 transition duration-200">
+        <i class="fas fa-save mr-1"></i>Speichern
+      </button>
     </div>
   `;
   logModal.showModal();
 
   $('#cancelBtn').onclick = () => logModal.close();
   $('#saveBtn').onclick = async () => {
-    const title = $('#logTitle').value.trim();
+    $('#saveBtn').disabled = true;
+    const type = $('#logType').value;
+    const titleInput = $('#logTitle').value.trim();
     const text = $('#logText').value.trim();
-    if(!title || !text){ alert('Bitte Titel und Text ausfüllen'); return; }
+    const title = titleInput ? `${type}: ${titleInput}` : type;
+    if(!text){ alert('Bitte Details ausfüllen'); $('#saveBtn').disabled = false; return; }
 
     const { error } = await sb.from('entries').insert({ person_id: currentDetailId, title, text });
-    if(error){ alert('Eintrag fehlgeschlagen: ' + error.message); return; }
+    if(error){ alert('Eintrag fehlgeschlagen: ' + error.message); $('#saveBtn').disabled = false; return; }
+
+    await logAudit('entries', 'INSERT', null, { person_id: currentDetailId, title, text });
 
     logModal.close();
     await refresh();
@@ -398,59 +571,98 @@ async function showLogModal(id){
   if(error || !data){ return alert('Eintrag nicht gefunden'); }
   const { title, text } = data;
 
-  logModal.style.width = '500px';
-  logModal.style.height = '500px';
+  logModal.style.width = '640px';
+  logModal.style.height = '520px';
 
   logModal.innerHTML = `
-    <h2 class="text-lg font-bold mb-2">${escapeHtml(title)}</h2>
-    <div style="height: calc(100% - 100px); overflow-y: auto;">
-      <p class="whitespace-pre-wrap">${escapeHtml(text)}</p>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-bold text-green-400">${escapeHtml(title)}</h2>
+      <button id="closeBtn" class="px-3 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-600 transition duration-200">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
-    <div class="flex justify-end gap-2 mt-2">
-      <button id="editBtn" class="px-3 py-1 rounded bg-blue-600">Bearbeiten</button>
-      <button id="closeBtn" class="px-3 py-1 rounded bg-gray-600">Schließen</button>
+    <div class="h-[calc(100%-100px)] overflow-y-auto rounded-2xl bg-gray-900 p-4 border border-gray-700">
+      <p class="text-gray-200 whitespace-pre-wrap">${escapeHtml(text)}</p>
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button id="editBtn" class="px-3 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition duration-200">Bearbeiten</button>
+      <button id="closeBtnSecondary" class="px-3 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-600 transition duration-200">Schließen</button>
     </div>
   `;
   logModal.showModal();
 
   $('#closeBtn').onclick = () => logModal.close();
+  $('#closeBtnSecondary').onclick = () => logModal.close();
   
   $('#editBtn').onclick = () => editLog(id, title, text);
 }
 
 function editLog(id, title, text) {
   const isSpecial = title === 'Vorherige Fraktionen';
+  const parsed = parseEntryTitle(title);
+  const currentType = parsed.type;
+  const rawTitle = parsed.title || (isSpecial ? title : '');
 
-  logModal.style.width = '400px';
-  logModal.style.height = '300px';
+  logModal.style.width = '620px';
+  logModal.style.height = '520px';
 
   logModal.innerHTML = `
-    <h2 class="text-lg font-bold mb-2">Eintrag bearbeiten</h2>
-    <input id="logTitle" class="w-full p-2 mb-2 rounded bg-gray-700 text-white" value="${escapeHtml(title)}" ${isSpecial ? 'readonly' : ''} />
-    <textarea id="logText" class="w-full p-2 mb-2 rounded bg-gray-700 text-white" rows="8">${escapeHtml(text)}</textarea>
-    <div class="flex justify-end gap-2">
-      <button id="cancelBtn" class="px-3 py-1 rounded bg-gray-600">Abbrechen</button>
-      <button id="saveBtn" class="px-3 py-1 rounded bg-blue-600">Speichern</button>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-bold text-green-400">Eintrag bearbeiten</h2>
+      <button id="cancelBtn" class="px-3 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-600 transition duration-200">Abbrechen</button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-1">Art</label>
+        <select id="logType" class="w-full p-3 rounded-2xl bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring focus:ring-green-500" ${isSpecial ? 'disabled' : ''}>
+          <option value="Notiz" ${currentType === 'Notiz' ? 'selected' : ''}>Notiz</option>
+          <option value="Verhaftung" ${currentType === 'Verhaftung' ? 'selected' : ''}>Verhaftung</option>
+          <option value="Vorladung" ${currentType === 'Vorladung' ? 'selected' : ''}>Vorladung</option>
+          <option value="Bericht" ${currentType === 'Bericht' ? 'selected' : ''}>Bericht</option>
+          <option value="Sonstiges" ${currentType === 'Sonstiges' ? 'selected' : ''}>Sonstiges</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm text-gray-400 mb-2">Titel</label>
+        <input id="logTitle" class="w-full p-3 rounded-2xl bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring focus:ring-green-500" value="${escapeHtml(rawTitle)}" ${isSpecial ? 'readonly' : ''} />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-400 mb-2">Details</label>
+        <textarea id="logText" class="w-full p-3 rounded-2xl bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring focus:ring-green-500" rows="10">${escapeHtml(text)}</textarea>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button id="saveBtn" class="px-4 py-2 rounded-2xl bg-green-600 text-white hover:bg-green-700 transition duration-200">Speichern</button>
     </div>
   `;
 
   $('#cancelBtn').onclick = () => logModal.close();
   $('#saveBtn').onclick = async () => {
+    $('#saveBtn').disabled = true;
     const newTitle = $('#logTitle').value.trim();
     const newText = $('#logText').value.trim();
+    const selectedType = $('#logType') ? $('#logType').value : 'Sonstiges';
 
     if (!newTitle || !newText) { 
       alert('Bitte Titel und Text ausfüllen'); 
+      $('#saveBtn').disabled = false;
       return; 
     }
 
-    const updateData = isSpecial ? { text: newText } : { title: newTitle, text: newText };
+    const titleValue = isSpecial ? title : `${selectedType}: ${newTitle}`;
+    const updateData = isSpecial ? { text: newText } : { title: titleValue, text: newText };
+
+    const { data: oldEntry, error: fetchError } = await sb.from('entries').select('title, text').eq('id', id).single();
+    if(fetchError){ alert('Fehler beim Laden des alten Eintrags: '+fetchError.message); $('#saveBtn').disabled = false; return; }
 
     const { error } = await sb.from('entries').update(updateData).eq('id', id);
     if (error) { 
       alert('Speichern fehlgeschlagen: ' + error.message); 
+      $('#saveBtn').disabled = false;
       return; 
     }
+
+    await logAudit('entries', 'UPDATE', oldEntry, updateData);
 
     logModal.close();
     const rec = state.records.find(x => x.id === currentDetailId);
@@ -460,8 +672,11 @@ function editLog(id, title, text) {
 
 
 async function deleteLog(logId){
+  const { data: oldEntry, error: fetchError } = await sb.from('entries').select('title, text').eq('id', logId).single();
+  if(fetchError){ alert('Fehler beim Laden des alten Eintrags: '+fetchError.message); return; }
   const { error } = await sb.from('entries').delete().eq('id', logId);
   if(error){ alert('Löschen fehlgeschlagen: '+error.message); return; }
+  await logAudit('entries', 'DELETE', oldEntry, null);
   const rec = state.records.find(x => x.id===currentDetailId);
   if(rec) await renderLogs(rec);
 }
@@ -544,12 +759,15 @@ async function deleteLog(logId){
 
     editForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
+      const submitBtn = e.target.querySelector('button[type=submit]') || e.target.querySelector('input[type=submit]');
+      if(submitBtn) submitBtn.disabled = true;
       const data = Object.fromEntries(new FormData(editForm).entries());
-      if(!data.name || data.name.trim().length<2){ alert('Bitte einen gültigen Namen eingeben.'); return; }
+      if(!data.name || data.name.trim().length<2){ alert('Bitte einen gültigen Namen eingeben.'); if(submitBtn) submitBtn.disabled = false; return; }
       if(data.phone){ data.phone = cleanPhone(data.phone); }
       if(data.id){ await updateRecord(data.id, data); }
       else { await createRecord(data); }
       editDialog.close();
+      if(submitBtn) submitBtn.disabled = false;
     });
 
     $('#btnConfig').addEventListener('click', configure);
@@ -568,6 +786,7 @@ async function deleteLog(logId){
 
     initClient();
     refresh();
+    document.getElementById('userDisplay').textContent = sessionStorage.getItem('username') || 'Unbekannt';
     initRealtime();
 
     if(!SUPABASE_URL || !SUPABASE_ANON){
