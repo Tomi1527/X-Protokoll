@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logs Interface</title>
+  <title>LSPD Logs Interface</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #121212;
+      background: #000000;
       color: #e0e0e0;
       display: flex;
       flex-direction: column;
@@ -33,17 +34,17 @@
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
+      box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
     }
 
     .button:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(0, 255, 204, 0.5);
+      box-shadow: 0 8px 25px rgba(0, 255, 0, 0.5);
     }
 
     .aktenlogs {
       background: linear-gradient(145deg, #1f1f1f, #2a2a2a);
-      color: #00ffcc;
+      color: #60a5fa;
     }
 
     .logs {
@@ -51,10 +52,14 @@
       color: #ff6f61;
     }
 
+    .button i {
+      margin-right: 10px;
+    }
+
     @keyframes pulse {
-      0% { box-shadow: 0 0 10px rgba(0,255,204,0.5); }
-      50% { box-shadow: 0 0 20px rgba(0,255,204,1); }
-      100% { box-shadow: 0 0 10px rgba(0,255,204,0.5); }
+      0% { box-shadow: 0 0 10px rgba(0,0,255,0.5); }
+      50% { box-shadow: 0 0 20px rgba(0,0,255,1); }
+      100% { box-shadow: 0 0 10px rgba(0,0,255,0.5); }
     }
 
     .aktenlogs:hover {
@@ -64,9 +69,13 @@
   </style>
 </head>
 <body>
-  <h1>Log Interface</h1>
-  <button class="button aktenlogs" onclick="window.location.href='aktenlogs.html'">Akten-Logs</button>
-  <button class="button logs" onclick="window.location.href='logs.html'">Login-Logs</button>
+  <h1><i class="fas fa-list-alt mr-2"></i>LSPD Log Interface</h1>
+  <button class="button aktenlogs" onclick="window.location.href='aktenlogs.html'">
+    <i class="fas fa-file-signature"></i>Akten-Logs
+  </button>
+  <button class="button logs" onclick="window.location.href='logs.html'">
+    <i class="fas fa-user-shield"></i>Login-Logs
+  </button>
 </body>
 </html>
 
