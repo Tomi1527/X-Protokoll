@@ -3,130 +3,237 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Änderungs-Dashboard</title>
+  <title>LSPD Änderungs-Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
+  <script>
   if(sessionStorage.getItem('loggedIn') !== 'true'){
     window.location.href = "index.html";
   }
 </script>
+  <style>
+    body { background: #000000; }
+  </style>
 </head>
-<body class="bg-gray-900 text-gray-100">
-  <div class="max-w-7xl mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-6">Änderungs-Dashboard</h1>
-    <table class="min-w-full border border-gray-700 rounded-xl overflow-hidden">
-      <thead class="bg-gray-700 text-sm sticky top-0 z-10">
-        <tr>
-          <th class="px-3 py-2 text-left">Zeitpunkt</th>
-          <th class="px-3 py-2 text-left">User</th>
-          <th class="px-3 py-2 text-left">Tabelle</th>
-          <th class="px-3 py-2 text-left">Aktion</th>
-          <th class="px-3 py-2 text-left">Vorher/Nachher</th>
-        </tr>
-      </thead>
-      <tbody id="logTable" class="divide-y divide-gray-700 text-sm"></tbody>
-    </table>
+<body class="bg-black text-white min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 py-6">
+    <header class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold flex items-center">
+        <i class="fas fa-history mr-2 text-green-400"></i>LSPD Änderungs-Dashboard
+      </h1>
+      <button onclick="window.location.href='logauswahl.html'" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition">
+        <i class="fas fa-arrow-left mr-1"></i>Zurück
+      </button>
+    </header>
+
+    <!-- Suchleiste und Filter -->
+    <div class="bg-gray-900 rounded-lg p-4 mb-4 flex flex-wrap gap-4 items-center">
+      <div class="flex-1 min-w-64">
+        <input id="searchInput" type="text" placeholder="Suche nach User, Tabelle, Aktion..." class="w-full px-3 py-2 bg-gray-800 text-white rounded border border-gray-600 focus:outline-none focus:ring focus:ring-green-500">
+      </div>
+      <select id="userFilter" class="px-3 py-2 bg-gray-800 text-white rounded border border-gray-600">
+        <option value="">Alle User</option>
+      </select>
+      <select id="tableFilter" class="px-3 py-2 bg-gray-800 text-white rounded border border-gray-600">
+        <option value="">Alle Tabellen</option>
+        <option value="persons">Personen</option>
+        <option value="entries">Einträge</option>
+      </select>
+      <select id="actionFilter" class="px-3 py-2 bg-gray-800 text-white rounded border border-gray-600">
+        <option value="">Alle Aktionen</option>
+        <option value="INSERT">Hinzugefügt</option>
+        <option value="UPDATE">Bearbeitet</option>
+        <option value="DELETE">Gelöscht</option>
+      </select>
+      <button id="clearFilters" class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">Filter löschen</button>
+    </div>
+
+    <div class="bg-gray-900 rounded-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-700">
+        <thead class="bg-gray-800">
+          <tr>
+            <th class="px-2 py-2 text-left text-xs font-medium text-gray-300 uppercase">Zeit</th>
+            <th class="px-2 py-2 text-left text-xs font-medium text-gray-300 uppercase">User</th>
+            <th class="px-2 py-2 text-left text-xs font-medium text-gray-300 uppercase">Tabelle</th>
+            <th class="px-2 py-2 text-left text-xs font-medium text-gray-300 uppercase">Aktion</th>
+            <th class="px-2 py-2 text-left text-xs font-medium text-gray-300 uppercase">Details</th>
+          </tr>
+        </thead>
+        <tbody id="logTable" class="divide-y divide-gray-700 text-sm">
+          <!-- Logs werden hier geladen -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <script>
-  const SUPABASE_URL = "https://xkflcxzifnpkhkmlzdoa.supabase.co";
-  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhrZmxjeHppZm5wa2hrbWx6ZG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1NjA4MDIsImV4cCI6MjA3MDEzNjgwMn0.QizK419VRChe2lHwF1hBldTnxqV2j1c1moScB_YL-dg";
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-  const logTable = document.getElementById('logTable');
+    const SUPABASE_URL = "https://xkflcxzifnpkhkmlzdoa.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhrZmxjeHppZm5wa2hrbWx6ZG9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1NjA4MDIsImV4cCI6MjA3MDEzNjgwMn0.QizK419VRChe2lHwF1hBldTnxqV2j1c1moScB_YL-dg";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    const logTable = document.getElementById('logTable');
+    const searchInput = document.getElementById('searchInput');
+    const userFilter = document.getElementById('userFilter');
+    const tableFilter = document.getElementById('tableFilter');
+    const actionFilter = document.getElementById('actionFilter');
+    const clearFilters = document.getElementById('clearFilters');
 
-  function fmt(d){ return new Date(d).toLocaleString(); }
+    let allLogs = [];
+    let allUsers = [];
 
-  function safeParse(json){
-    if(!json) return null;
-    if(typeof json === 'string'){
-      try { return JSON.parse(json); } catch(err){ return json; }
-    }
-    return json;
-  }
+    function fmt(d) { return new Date(d).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' }); }
 
-  async function fetchPersonName(personId) {
-    if (!personId) return null;
-    const { data, error } = await sb
-      .from('persons') 
-      .select('name')
-      .eq('id', personId)
-      .single();
-    return error ? null : data.name;
-  }
-
-
-  async function renderData(obj, type='person'){
-    obj = safeParse(obj);
-    if(!obj) return '—';
-
-    if(type === 'entry'){
-      let personName = obj.person_id ? await fetchPersonName(obj.person_id) : null;
-      const fields = [
-        ['Titel', obj.title],
-        ['Text', obj.text],
-        ['Person', personName]
-      ];
-      return fields.filter(([_, val]) => val).map(([label,val]) => `<strong>${label}:</strong> ${val}`).join('<br>');
+    function safeParse(json) {
+      if (!json) return null;
+      try { return JSON.parse(json); } catch { return json; }
     }
 
-
-    const fields = [
-      ['Name', obj.name],
-      ['Tel.', obj.phone],
-      ['Fraktion', obj.notes]
-    ];
-    return fields.filter(([_, val]) => val).map(([label,val]) => `<strong>${label}:</strong> ${val}`).join('<br>');
-  }
-
- 
-  async function renderDetails(table, oldData, newData){
-    const type = table==='entries' ? 'entry' : 'person';
-    const oldHtml = await renderData(oldData, type);
-    const newHtml = await renderData(newData, type);
-
-    return `
-      <div class="grid grid-cols-2 gap-4">
-        <div><span class="text-gray-400">Vorher:</span><br>${oldHtml}</div>
-        <div><span class="text-gray-400">Nachher:</span><br>${newHtml}</div>
-      </div>
-    `;
-  }
-
-
-  async function loadLogs(){
-    const { data, error } = await sb
-      .from('audit_logs')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100);
-
-    if(error){
-      logTable.innerHTML = `<tr><td colspan="5" class="px-3 py-2 text-red-400">Fehler: ${error.message}</td></tr>`;
-      return;
+    function translateAction(action) {
+      const actions = { 'INSERT': 'Hinzugefügt', 'UPDATE': 'Bearbeitet', 'DELETE': 'Gelöscht' };
+      return actions[action] || action;
     }
 
-    logTable.innerHTML = '';
-
-    for(const l of data){
-      let details = await renderDetails(l.table_name, l.old_data, l.new_data);
-
-      const row = document.createElement('tr');
-      row.className = 'hover:bg-gray-800 transition-colors duration-150';
-      row.innerHTML = `
-        <td class="px-3 py-2 whitespace-nowrap">${fmt(l.created_at)}</td>
-        <td class="px-3 py-2">${l.username || '—'}</td>
-        <td class="px-3 py-2">${l.table_name}</td>
-        <td class="px-3 py-2">${l.action}</td>
-        <td class="px-3 py-2 text-xs break-words">${details}</td>
-      `;
-      logTable.appendChild(row);
+    function translateTable(table) {
+      const tables = { 'persons': 'Personen', 'entries': 'Einträge' };
+      return tables[table] || table;
     }
-  }
 
-  loadLogs();
-</script>
+    async function fetchPersonName(personId) {
+      if (!personId) return 'Unbekannt';
+      try {
+        const { data } = await sb.from('persons').select('name').eq('id', personId).single();
+        return data?.name || 'Unbekannt';
+      } catch { return 'Unbekannt'; }
+    }
 
+    async function renderData(obj, type = 'person') {
+      if (!obj) return '<span class="text-gray-500">—</span>';
+      obj = safeParse(obj);
+      if (!obj) return '<span class="text-gray-500">—</span>';
+
+      if (type === 'entry') {
+        const personName = obj.person_id ? await fetchPersonName(obj.person_id) : 'Unbekannt';
+        const fields = [['Titel', obj.title], ['Text', obj.text], ['Person', personName]];
+        return fields.filter(([_, val]) => val).map(([label, val]) => `<div class="text-xs"><strong class="text-green-400">${label}:</strong> ${val}</div>`).join('');
+      }
+
+      const fields = [['Name', obj.name], ['Telefon', obj.phone], ['Adresse', obj.address], ['Notizen', obj.notes]];
+      return fields.filter(([_, val]) => val).map(([label, val]) => `<div class="text-xs"><strong class="text-green-400">${label}:</strong> ${val}</div>`).join('');
+    }
+
+    async function renderDetails(table, oldData, newData) {
+      const type = table === 'entries' ? 'entry' : 'person';
+      const oldHtml = await renderData(oldData, type);
+      const newHtml = await renderData(newData, type);
+      return `<div class="space-y-1"><div class="bg-red-900/20 p-1 rounded text-xs"><div class="text-red-400 font-semibold">Vorher:</div>${oldHtml}</div><div class="bg-green-900/20 p-1 rounded text-xs"><div class="text-green-400 font-semibold">Nachher:</div>${newHtml}</div></div>`;
+    }
+
+    async function loadUsers() {
+      try {
+        const { data } = await sb.from('users').select('username').order('username');
+        allUsers = data || [];
+        userFilter.innerHTML = '<option value="">Alle User</option>';
+        allUsers.forEach(user => {
+          const option = document.createElement('option');
+          option.value = user.username;
+          option.textContent = user.username;
+          userFilter.appendChild(option);
+        });
+      } catch (err) {
+        console.error('Fehler beim Laden der User:', err);
+      }
+    }
+
+    async function loadLogs() {
+      try {
+        const { data, error } = await sb.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(100);
+        if (error) {
+          logTable.innerHTML = `<tr><td colspan="5" class="px-2 py-4 text-center text-red-400">Fehler: ${error.message}</td></tr>`;
+          return;
+        }
+        // Entferne Duplikate basierend auf created_at, table_name, action, username
+        const seen = new Set();
+        allLogs = (data || []).filter(log => {
+          const key = `${log.created_at}-${log.table_name}-${log.action}-${log.username}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        filterAndRender();
+      } catch (err) {
+        logTable.innerHTML = `<tr><td colspan="5" class="px-2 py-4 text-center text-red-400">Unerwarteter Fehler: ${err.message}</td></tr>`;
+      }
+    }
+
+    function filterAndRender() {
+      let filtered = allLogs;
+
+      const search = searchInput.value.toLowerCase();
+      if (search) {
+        filtered = filtered.filter(log =>
+          (log.username || '').toLowerCase().includes(search) ||
+          translateTable(log.table_name).toLowerCase().includes(search) ||
+          translateAction(log.action).toLowerCase().includes(search)
+        );
+      }
+
+      const user = userFilter.value;
+      if (user) filtered = filtered.filter(log => log.username === user);
+
+      const table = tableFilter.value;
+      if (table) filtered = filtered.filter(log => log.table_name === table);
+
+      const action = actionFilter.value;
+      if (action) filtered = filtered.filter(log => log.action === action);
+
+      renderLogs(filtered);
+    }
+
+    async function renderLogs(logs) {
+      logTable.innerHTML = '';
+      if (logs.length === 0) {
+        logTable.innerHTML = `<tr><td colspan="5" class="px-2 py-4 text-center text-gray-500">Keine Logs gefunden.</td></tr>`;
+        return;
+      }
+
+      for (const log of logs) {
+        const details = await renderDetails(log.table_name, log.old_data, log.new_data);
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-800 transition-colors';
+        row.innerHTML = `
+          <td class="px-2 py-2 whitespace-nowrap text-xs text-gray-300">${fmt(log.created_at)}</td>
+          <td class="px-2 py-2 text-xs font-medium text-white">${log.username || 'Unbekannt'}</td>
+          <td class="px-2 py-2 text-xs text-gray-300">${translateTable(log.table_name)}</td>
+          <td class="px-2 py-2 text-xs">
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
+              log.action === 'INSERT' ? 'bg-green-900 text-green-300' :
+              log.action === 'UPDATE' ? 'bg-blue-900 text-blue-300' :
+              log.action === 'DELETE' ? 'bg-red-900 text-red-300' : 'bg-gray-900 text-gray-300'
+            }">${translateAction(log.action)}</span>
+          </td>
+          <td class="px-2 py-2 text-xs text-gray-300">${details}</td>
+        `;
+        logTable.appendChild(row);
+      }
+    }
+
+    // Event Listener
+    searchInput.addEventListener('input', filterAndRender);
+    userFilter.addEventListener('change', filterAndRender);
+    tableFilter.addEventListener('change', filterAndRender);
+    actionFilter.addEventListener('change', filterAndRender);
+    clearFilters.addEventListener('click', () => {
+      searchInput.value = '';
+      userFilter.value = '';
+      tableFilter.value = '';
+      actionFilter.value = '';
+      filterAndRender();
+    });
+
+    // Initial laden
+    loadUsers();
+    loadLogs();
+  </script>
 </body>
 </html>
 
