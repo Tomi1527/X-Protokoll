@@ -2,7 +2,8 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Login Übersicht X-Protokoll</title>
+  <title>LSPD Login Logs</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <script>
   if(sessionStorage.getItem('loggedIn') !== 'true'){
     window.location.href = "index.html";
@@ -12,7 +13,7 @@
   <style>
     body {
       font-family: "Segoe UI", Tahoma, sans-serif;
-      background: #0f172a;
+      background: #000000;
       margin: 0;
       padding: 40px;
       color: #f1f5f9;
@@ -28,11 +29,12 @@
     .table-container {
       max-width: 900px;
       margin: 0 auto;
-      background: #1e293b;
+      background: rgba(30, 41, 59, 0.9);
       padding: 20px;
       border-radius: 16px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.6);
       overflow-x: auto;
+      backdrop-filter: blur(10px);
     }
 
     table {
@@ -42,7 +44,7 @@
     }
 
     thead {
-      background: #334155;
+      background: rgba(51, 65, 85, 0.8);
       color: #e2e8f0;
     }
 
@@ -58,7 +60,7 @@
     }
 
     tr:hover {
-      background: #334155;
+      background: rgba(51, 65, 85, 0.5);
       transition: 0.2s ease;
     }
 
@@ -71,7 +73,7 @@
     .logins-list {
       margin: 10px 0 20px 20px;
       padding: 10px;
-      background: #0f172a;
+      background: rgba(15, 23, 42, 0.8);
       border-left: 3px solid #60a5fa;
       border-radius: 6px;
       display: none;
@@ -97,20 +99,39 @@
     }
 
     .tag.success {
-      background: #14532d;
-      color: #4ade80;
-      margin-left: 8px;
+      background: rgba(5, 150, 105, 0.8);
+      color: #d1fae5;
     }
 
-    .tag.fail {
-      background: #7f1d1d;
-      color: #f87171;
-      margin-left: 8px;
+    .tag.failure {
+      background: rgba(220, 38, 38, 0.8);
+      color: #fecaca;
     }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 15px;
+      background: rgba(59, 130, 246, 0.8);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .back-btn:hover {
+      background: rgba(59, 130, 246, 1);
+    }
+
   </style>
 </head>
 <body>
-  <h1>Login Übersicht</h1>
+  <button class="back-btn" onclick="window.location.href='logauswahl.html'">
+    <i class="fas fa-arrow-left mr-1"></i>Zurück
+  </button>
+  <h1><i class="fas fa-user-shield mr-2"></i>LSPD Login Übersicht</h1>
   <div class="table-container">
     <table>
       <thead>
